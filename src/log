@@ -18,6 +18,7 @@
 
 
 
+
 ---------------------------- 708 ----------------------------
 : cold
     @p b! @p @p
@@ -30,18 +31,8 @@
         SOUTH
 
 : again
-    @p push
-        141
-: dump
-    @
-    call emit18
-    drop next dump
-
-    @p call emit18
-    0x00947
-
-: again
-    jump again
+    @ call emit18
+    drop jump again
 
 
 : emit18 ( x -- x)
@@ -72,12 +63,252 @@
 
 
 
----------------------------- 608 ----------------------------
-    @p a! @p @p
-        NORTH
-        1
-        0
+
+---------------------------- 607 ----------------------------
+
+\ Carry words from WEST to EAST
+\ attr: render wire WEST EAST
+    @p a! @p
+        WEST
+        EAST
+    b!
 : again
-    over over . +     \ next fibonacci term
-    dup !             \ send to NORTH
-    jump again        \ forever
+    @ !b
+    jump again
+
+
+
+
+---------------------------- 608 ----------------------------
+
+\ Carry words from WEST to NORTH
+\ attr: render wire WEST NORTH
+    @p a! @p
+        WEST
+        NORTH
+    b!
+: again
+    @ !b
+    jump again
+
+
+
+
+
+---------------------------- 705 ----------------------------
+\ See block 1428 for ROM definitions
+\ For usage notes:
+\   https://mschuldt.github.io/www.colorforth.com/flash.htm
+\   http://ww1.microchip.com/downloads/en/DeviceDoc/25024C.pdf
+\ EVB001 note: check jumpers J20 and J26
+
+   \ dw-dw
+   \ dw-dw'    Note that w is left-justified
+   \ d-dw
+   \ 
+
+
+
+    @p a!
+      SOUTH
+    @p b!
+      io
+    @p                      \ d (delay), always on stack
+      0
+: again
+    @p call cmd
+      3072    \ read
+    @p a! @
+      SOUTH
+    call 0xc2
+    call 0xc2
+    call 0xc2
+    drop
+    call 8i
+    push @p a!
+      EAST
+: readloop
+    call 0xd9
+    ! next readloop
+    jump again
+
+: cmd   \ dn-d
+    call 0xcc
+: 8!    \ dn-d
+    call 0xc2
+    drop ;
+
+: 8i   \ d-dw
+    dup dup or
+    @p push
+      7
+    jump 0xdb
+
+---------------------------- 706 ----------------------------
+
+\ Carry words from WEST to SOUTH
+\ attr: render wire WEST SOUTH
+    @p a! @p
+        WEST
+        SOUTH
+    b!
+: again
+    @ !b
+    jump again
+
+
+
+---------------------------- 605 ----------------------------
+  
+    @p b!
+      NORTH
+    @p a!
+      RSTACKTOP
+: main
+    jump EAST
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+: RSTACKTOP
+: RETURN
+    @+ !b ;
+: RPUSH
+    @p a +
+      -1
+    a! ! ;
+
+---------------------------- 606 ----------------------------
+
+    @p b!
+      WEST
+    @p a!
+      STACKTOP
+    @p
+      0x947
+: again
+    @p call GO
+      0
+    jump NORTH
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+    .
+: STACKTOP
+: TO_R
+    @p !b !b ;
+      @p call 605.RPUSH
+: DORETURN
+    @p !b ;
+      call 605.RETURN
+: GO
+    @p !b !b ;
+      @p !b
+: LIT
+    over
+: -!
+    @p a +
+      -1
+    a! ! ;
